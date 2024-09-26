@@ -15,7 +15,7 @@ class UserRequestsModel extends Model
 
     protected $fillable = [
         'chat_id',
-        'test_id',
+        'bejik_id',
     ];
 
     public function chat(): BelongsTo

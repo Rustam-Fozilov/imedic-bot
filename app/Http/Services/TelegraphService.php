@@ -26,17 +26,16 @@ class TelegraphService
             $phone = "+" . $phone;
         }
 
-        $user = User::query()->firstOrCreate(
-            ['phone' => $phone],
+        User::query()->firstOrCreate(
+            [
+                'phone' => $phone,
+                'telegraph_chat_id' => $this->chat->id,
+            ],
             [
                 'f_name' => $this->message->from()->firstName(),
                 'l_name' => $this->message->from()->lastName(),
             ]
         );
-
-        $user->update([
-            'telegraph_chat_id' => $this->chat->id,
-        ]);
 
         $this->chat->message('Rahmat! xabarnomalarni shu yerda kuting')->removeReplyKeyboard()->replyKeyboard(ReplyKeyboard::make()->buttons([
             ReplyButton::make("Natijalarni ko'rish")

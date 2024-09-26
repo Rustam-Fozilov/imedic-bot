@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_requests', function (Blueprint $table) {
             $table->id();
             $table->integer('chat_id');
-            $table->integer('test_id');
+            $table->integer('bejik_id');
             $table->timestamps();
         });
     }
