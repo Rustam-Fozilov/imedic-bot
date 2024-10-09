@@ -8,5 +8,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('users', [ResultController::class, 'sendUsers'])->name('result.store');
-Route::post('results', [ResultController::class, 'syncResults'])->name('result.sync');
+Route::middleware('project_token')->group(function () {
+    Route::post('user-requests', [ResultController::class, 'sendUsers']);
+    Route::post('get-results', [ResultController::class, 'getResults']);
+});

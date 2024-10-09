@@ -14,6 +14,7 @@ class UserRequestsModel extends Model
     protected $table = 'user_requests';
 
     protected $fillable = [
+        'user_id',
         'chat_id',
         'bejik_id',
     ];
@@ -21,5 +22,10 @@ class UserRequestsModel extends Model
     public function chat(): BelongsTo
     {
         return $this->belongsTo(TelegraphChat::class, 'chat_id', 'id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

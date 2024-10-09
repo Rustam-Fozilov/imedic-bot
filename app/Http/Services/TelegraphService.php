@@ -4,13 +4,17 @@ namespace App\Http\Services;
 
 use App\Models\User;
 use App\Models\UserRequestsModel;
+use DefStudio\Telegraph\DTO\Message;
+use DefStudio\Telegraph\Enums\ChatActions;
+use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Keyboard\ReplyButton;
 use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
+use DefStudio\Telegraph\Models\TelegraphChat;
 
 class TelegraphService
 {
-    protected mixed $message;
-    protected mixed $chat;
+    protected Message $message;
+    protected TelegraphChat $chat;
 
     public function __construct($message, $chat)
     {
@@ -22,28 +26,43 @@ class TelegraphService
     {
         $phone = $this->message->contact()->phoneNumber();
 
-        if (!str_contains($phone, '+')) {
-            $phone = "+" . $phone;
+        if (str_contains($phone, '+')) {
+            $phone = str_replace('+', '', $phone);
         }
 
-        User::query()->firstOrCreate(
+        User::query()->updateOrCreate(
             [
                 'phone' => $phone,
-                'telegraph_chat_id' => $this->chat->id,
+                'telegram_chat_id' => $this->chat->chat_id,
             ],
             [
-                'f_name' => $this->message->from()->firstName(),
-                'l_name' => $this->message->from()->lastName(),
+                'name' => $this->message->from()->firstName(),
+                'surname' => $this->message->from()->lastName(),
             ]
         );
 
         $this->chat->message('Rahmat! xabarnomalarni shu yerda kuting')->removeReplyKeyboard()->replyKeyboard(ReplyKeyboard::make()->buttons([
             ReplyButton::make("Natijalarni ko'rish")
-        ]))->send();
+        ])->resize())->send();
     }
 
     public function showResults($id)
     {
-        $this->chat->message($id)->send();
+        $user = User::query()->where('telegram_chat_id', $this->chat->chat_id)->first();
+
+        if (is_null($user)) {
+            return $this->chat->message("Sizning ma'lumotlaringiz bazadan topilmadi")->send();
+        }
+
+        UserRequestsModel::query()->firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'chat_id' => $this->chat->id,
+                'bejik_id' => $id,
+            ],
+        );
+
+        $this->chat->message('Natijangizni qidiryapmiz. Biroz kuting...')->send();
+        Telegraph::chat($this->chat)->chatAction(ChatActions::TYPING)->send();
     }
 }

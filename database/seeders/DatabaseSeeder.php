@@ -2,23 +2,33 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    protected array $once_seeders = [
+        Once\AdminSeeder::class,
+        Once\TelegraphBotSeeder::class,
+        Once\TelegraphChatSeeder::class,
+    ];
+ 
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->seedOnce();
+    }
 
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@app.com',
-            'password' => bcrypt('admin'),
-        ]);
+    public function seedOnce(): void
+    {
+        $seeders = [];
+
+        foreach ($this->once_seeders as $seed) {
+
+            if (isset($seed::$model) && (!$seed::$model::first())) $seeders[] = $seed;
+        }
+
+        if (!empty($seeders)) $this->call($seeders);
     }
 }

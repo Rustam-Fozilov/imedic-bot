@@ -19,7 +19,7 @@ class StartHandler extends WebhookHandler
         $this->chat->message("Salom, " . $this->message->from()->firstName() . " 👋" . PHP_EOL . "⬇️ Kontaktingizni yuboring (tugmani bosib)")
             ->replyKeyboard(ReplyKeyboard::make()->buttons([
                 ReplyButton::make("☎️ Kontaktni Yuborish")->requestContact(),
-            ]))
+            ])->resize())
             ->send();
     }
 
